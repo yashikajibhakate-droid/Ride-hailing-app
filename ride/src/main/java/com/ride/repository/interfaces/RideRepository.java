@@ -13,7 +13,7 @@ public interface RideRepository {
 
     List<Ride> findByStatus(RideStatus status);
 
-    void update(Ride ride);
+    void updateRide(Ride ride);
 
     boolean acceptRide(int rideId, int driverId);
 

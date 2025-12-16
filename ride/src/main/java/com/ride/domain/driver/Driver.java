@@ -11,7 +11,7 @@ public class Driver {
     private String currentlyDrivingVehicleNo;
 
     public Driver(int driverId, String driverName, String phone,
-            String licenseNo, String currentlyDrivingVehicleNo) {
+            String licenseNo, String currentlyDrivingVehicleNo, String email) {
         this.driverId = driverId;
         this.driverName = driverName;
         this.phone = phone;

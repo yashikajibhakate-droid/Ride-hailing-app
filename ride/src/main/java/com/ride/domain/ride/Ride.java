@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 public class Ride {
 
-    private int rideId;
+    public int rideId;
 
     private String pickup;
     private String dropoff;
