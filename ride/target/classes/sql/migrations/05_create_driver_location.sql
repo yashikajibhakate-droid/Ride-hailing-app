@@ -1,0 +1,6 @@
+CREATE TABLE driver_location (
+    driver_id INT PRIMARY KEY REFERENCES driver(driver_id),
+    lat DOUBLE PRECISION NOT NULL,
+    lon DOUBLE PRECISION NOT NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
