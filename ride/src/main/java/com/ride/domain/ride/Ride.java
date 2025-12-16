@@ -36,6 +36,15 @@ public class Ride {
         this.requestedAt = LocalDateTime.now();
     }
 
+    public Ride() {
+        //TODO Auto-generated constructor stub
+    }
+
+    public Ride(int int1, int int2, String string, String string2, Location location, Location location2,
+            RideStatus valueOf) {
+        //TODO Auto-generated constructor stub
+    }
+
     public RideStatus getStatus() {
         return status;
     }
@@ -99,5 +108,24 @@ public class Ride {
 
     public void setEndedAt(LocalDateTime endedAt) {
         this.endedAt = endedAt;
+    }
+
+    public void setStatus(RideStatus status) {
+        this.status = status;
+    }
+    public void setRideId(int rideId) {
+        this.rideId = rideId;
+    }
+    public void setRiderId(int riderId) {
+        this.riderId = riderId;
+    }
+    public void setDriverId(int driverId) {
+        this.driverId = driverId;
+    }
+    public void setPickup(String pickup) {
+        this.pickup = pickup;
+    }
+    public void setDropoff(String dropoff) {
+        this.dropoff = dropoff;
     }
 }

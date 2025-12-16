@@ -16,4 +16,6 @@ public interface RiderService {
     Ride getRideStatus(int rideId);
 
     void cancelRide(int rideId, int riderId);
+
+    void validateRider(int riderId);
 }

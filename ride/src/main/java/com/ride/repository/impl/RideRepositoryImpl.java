@@ -7,21 +7,22 @@ import com.ride.domain.ride.RideStatus;
 import com.ride.repository.interfaces.RideRepository;
 
 import java.sql.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class RideRepositoryImpl implements RideRepository {
 
     @Override
-    public Ride create(Ride ride) {
+    public int save(Ride ride) {
+
         String sql = """
             INSERT INTO ride (
                 rider_id, pickup, dropoff,
                 pickup_lat, pickup_lon,
                 dropoff_lat, dropoff_lon,
                 status, requested_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
             RETURNING ride_id
         """;
 
@@ -35,22 +36,88 @@ public class RideRepositoryImpl implements RideRepository {
             ps.setDouble(5, ride.getPickupLocation().getLon());
             ps.setDouble(6, ride.getDropoffLocation().getLat());
             ps.setDouble(7, ride.getDropoffLocation().getLon());
-            ps.setString(8, ride.getStatus().name());
-            ps.setTimestamp(9, Timestamp.valueOf(LocalDateTime.now()));
+            ps.setString(8, RideStatus.REQUESTED.name());
 
             ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                ride.rideId = rs.getInt(1);
-            }
-            return ride;
+            rs.next();
+            return rs.getInt("ride_id");
 
-        } catch (Exception e) {
-            throw new RuntimeException("Error creating ride", e);
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to create ride", e);
         }
     }
 
     @Override
+    public boolean acceptRide(int rideId, int driverId) {
+
+        String sql = """
+            UPDATE ride
+            SET driver_id = ?, status = 'ACCEPTED', accepted_at = NOW()
+            WHERE ride_id = ? AND status = 'REQUESTED'
+        """;
+
+        return executeUpdate(sql, driverId, rideId);
+    }
+
+    @Override
+    public boolean beginRide(int rideId, int driverId) {
+
+        String sql = """
+            UPDATE ride
+            SET status = 'IN_PROGRESS', started_at = NOW()
+            WHERE ride_id = ?
+              AND driver_id = ?
+              AND status = 'ACCEPTED'
+        """;
+
+        return executeUpdate(sql, rideId, driverId);
+    }
+
+    @Override
+    public boolean endRide(int rideId, int driverId) {
+
+        String sql = """
+            UPDATE ride
+            SET status = 'COMPLETED', ended_at = NOW()
+            WHERE ride_id = ?
+              AND driver_id = ?
+              AND status = 'IN_PROGRESS'
+        """;
+
+        return executeUpdate(sql, rideId, driverId);
+    }
+
+    @Override
+    public boolean riderCancelRide(int rideId, int riderId) {
+
+        String sql = """
+            UPDATE ride
+            SET status = 'CANCELED'
+            WHERE ride_id = ?
+              AND rider_id = ?
+              AND status IN ('REQUESTED', 'ACCEPTED')
+        """;
+
+        return executeUpdate(sql, rideId, riderId);
+    }
+
+    @Override
+    public boolean driverCancelRide(int rideId, int driverId) {
+
+        String sql = """
+            UPDATE ride
+            SET status = 'DRIVER_CANCELED'
+            WHERE ride_id = ?
+              AND driver_id = ?
+              AND status = 'ACCEPTED'
+        """;
+
+        return executeUpdate(sql, rideId, driverId);
+    }
+
+    @Override
     public Ride findById(int rideId) {
+
         String sql = "SELECT * FROM ride WHERE ride_id = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
@@ -59,67 +126,146 @@ public class RideRepositoryImpl implements RideRepository {
             ps.setInt(1, rideId);
             ResultSet rs = ps.executeQuery();
 
-            if (rs.next()) {
-                // Mapping left concise for clarity
-                return null; // (will complete fully in service step)
+            if (!rs.next()) return null;
+
+            Ride ride = new Ride();
+            ride.setRideId(rs.getInt("ride_id"));
+            ride.setRiderId(rs.getInt("rider_id"));
+            ride.setDriverId(rs.getInt("driver_id"));
+            ride.setPickup(rs.getString("pickup"));
+            ride.setDropoff(rs.getString("dropoff"));
+            ride.setStatus(RideStatus.valueOf(rs.getString("status")));
+
+            return ride;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to fetch ride", e);
+        }
+    }
+
+    // 🔹 Utility method
+    private boolean executeUpdate(String sql, Object... params) {
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            for (int i = 0; i < params.length; i++) {
+                ps.setObject(i + 1, params[i]);
             }
-            return null;
-
-        } catch (Exception e) {
-            throw new RuntimeException("Error fetching ride", e);
-        }
-    }
-
-    @Override
-    public List<Ride> findByStatus(RideStatus status) {
-        return new ArrayList<>();
-    }
-
-    @Override
-    public void updateRide(Ride ride) {
-        String sql = """
-            UPDATE ride SET
-                status = ?,
-                accepted_at = ?,
-                started_at = ?,
-                ended_at = ?
-            WHERE ride_id = ?
-        """;
-
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, ride.getStatus().name());
-            ps.setTimestamp(2, null);
-            ps.setTimestamp(3, null);
-            ps.setTimestamp(4, null);
-            ps.setInt(5, ride.getRideId());
-
-            ps.executeUpdate();
-
-        } catch (Exception e) {
-            throw new RuntimeException("Error updating ride", e);
-        }
-    }
-
-    @Override
-    public boolean acceptRide(int rideId, int driverId) {
-        String sql = """
-            UPDATE ride
-            SET driver_id=?, status='ACCEPTED', accepted_at=NOW()
-            WHERE ride_id=? AND status='REQUESTED'
-        """;
-
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(1, driverId);
-            ps.setInt(2, rideId);
 
             return ps.executeUpdate() == 1;
 
-        } catch (Exception e) {
-            throw new RuntimeException("Error accepting ride", e);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
+
+    @Override
+public List<Ride> findAvailableRidesForDriver(int driverId) {
+
+    List<Ride> rides = new ArrayList<>();
+
+    String sql = """
+        SELECT 
+            ride_id,
+            rider_id,
+            pickup,
+            dropoff,
+            pickup_lat,
+            pickup_lon,
+            dropoff_lat,
+            dropoff_lon,
+            status
+        FROM ride
+        WHERE status = 'REQUESTED'
+        """;
+
+    try (Connection conn = DatabaseConnection.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql);
+         ResultSet rs = ps.executeQuery()) {
+
+        while (rs.next()) {
+
+            Ride ride = new Ride(
+                    rs.getInt("ride_id"),
+                    rs.getInt("rider_id"),
+                    rs.getString("pickup"),
+                    rs.getString("dropoff"),
+                    new Location(
+                            rs.getDouble("pickup_lat"),
+                            rs.getDouble("pickup_lon")
+                    ),
+                    new Location(
+                            rs.getDouble("dropoff_lat"),
+                            rs.getDouble("dropoff_lon")
+                    ),
+                    RideStatus.valueOf(rs.getString("status"))
+            );
+
+            rides.add(ride);
+        }
+
+    } catch (SQLException e) {
+        throw new RuntimeException("Failed to fetch available rides", e);
+    }
+
+    return rides;
+}
+@Override
+public Ride getRideById(int rideId) {
+
+    String sql = """
+        SELECT 
+            ride_id,
+            rider_id,
+            pickup,
+            dropoff,
+            pickup_lat,
+            pickup_lon,
+            dropoff_lat,
+            dropoff_lon,
+            status
+        FROM ride
+        WHERE ride_id = ?
+        """;
+
+    try (Connection conn = DatabaseConnection.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+
+        ps.setInt(1, rideId);
+
+        try (ResultSet rs = ps.executeQuery()) {
+
+            if (!rs.next()) {
+                return null; // ride not found
+            }
+
+            return new Ride(
+                    rs.getInt("ride_id"),
+                    rs.getInt("rider_id"),
+                    rs.getString("pickup"),
+                    rs.getString("dropoff"),
+                    new Location(
+                            rs.getDouble("pickup_lat"),
+                            rs.getDouble("pickup_lon")
+                    ),
+                    new Location(
+                            rs.getDouble("dropoff_lat"),
+                            rs.getDouble("dropoff_lon")
+                    ),
+                    RideStatus.valueOf(rs.getString("status"))
+            );
+        }
+
+    } catch (SQLException e) {
+        throw new RuntimeException("Failed to fetch ride by ID", e);
+    }
+}
+@Override
+public Ride getRideStatus(int rideId) {
+    return getRideById(rideId);
+}
+
+
+ 
 }
