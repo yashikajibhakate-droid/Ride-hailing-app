@@ -20,7 +20,7 @@ public class RideRepositoryImpl implements RideRepository {
                 rider_id, pickup, dropoff,
                 pickup_lat, pickup_lon,
                 dropoff_lat, dropoff_lon,
-                status, requested_at
+                status, ride_requested_at
             )
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
             RETURNING ride_id
@@ -215,16 +215,20 @@ public List<Ride> findAvailableRidesForDriver(int driverId) {
 public Ride getRideById(int rideId) {
 
     String sql = """
-        SELECT 
+        SELECT
             ride_id,
             rider_id,
+            driver_id,
             pickup,
             dropoff,
             pickup_lat,
             pickup_lon,
             dropoff_lat,
             dropoff_lon,
-            status
+            status,
+            ride_requested_at,
+            ride_accepted_at,
+            ride_ended_at
         FROM ride
         WHERE ride_id = ?
         """;
@@ -237,30 +241,65 @@ public Ride getRideById(int rideId) {
         try (ResultSet rs = ps.executeQuery()) {
 
             if (!rs.next()) {
-                return null; // ride not found
+                return null; // or throw RideNotFoundException
             }
 
-            return new Ride(
-                    rs.getInt("ride_id"),
-                    rs.getInt("rider_id"),
-                    rs.getString("pickup"),
-                    rs.getString("dropoff"),
-                    new Location(
-                            rs.getDouble("pickup_lat"),
-                            rs.getDouble("pickup_lon")
-                    ),
-                    new Location(
-                            rs.getDouble("dropoff_lat"),
-                            rs.getDouble("dropoff_lon")
-                    ),
-                    RideStatus.valueOf(rs.getString("status"))
+            Ride ride = new Ride();
+
+            ride.setRideId(rs.getInt("ride_id"));
+            ride.setRiderId(rs.getInt("rider_id"));
+
+            int driverId = rs.getInt("driver_id");
+            if (!rs.wasNull()) {
+                ride.setDriverId(driverId);
+            }
+
+            ride.setPickup(rs.getString("pickup"));
+            ride.setDropoff(rs.getString("dropoff"));
+
+            ride.setPickupLocation(
+                new Location(
+                    rs.getDouble("pickup_lat"),
+                    rs.getDouble("pickup_lon")
+                )
             );
+
+            ride.setDropoffLocation(
+                new Location(
+                    rs.getDouble("dropoff_lat"),
+                    rs.getDouble("dropoff_lon")
+                )
+            );
+
+            ride.setStatus(RideStatus.valueOf(rs.getString("status")));
+
+            ride.setRequestedAt(
+                rs.getTimestamp("ride_requested_at").toLocalDateTime()
+            );
+
+            Timestamp acceptedTs = rs.getTimestamp("ride_accepted_at");
+            if (acceptedTs != null) {
+                ride.setAcceptedAt(acceptedTs.toLocalDateTime());
+            }
+
+            // Timestamp startedTs = rs.getTimestamp("ride_started_at");
+            // if (startedTs != null) {
+            //     ride.setStartedAt(startedTs.toLocalDateTime());
+            // }
+
+            Timestamp endedTs = rs.getTimestamp("ride_ended_at");
+            if (endedTs != null) {
+                ride.setEndedAt(endedTs.toLocalDateTime());
+            }
+
+            return ride;
         }
 
     } catch (SQLException e) {
-        throw new RuntimeException("Failed to fetch ride by ID", e);
+        throw new RuntimeException("Error fetching ride " + rideId, e);
     }
 }
+
 @Override
 public Ride getRideStatus(int rideId) {
     return getRideById(rideId);

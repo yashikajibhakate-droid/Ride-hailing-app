@@ -128,4 +128,15 @@ public class Ride {
     public void setDropoff(String dropoff) {
         this.dropoff = dropoff;
     }
+
+    public void setPickupLocation(Location pickupLocation) {
+        this.pickupLocation = pickupLocation;
+    }
+    public void setDropoffLocation(Location dropoffLocation) {
+        this.dropoffLocation = dropoffLocation;
+    }
+
+    public void setRequestedAt(LocalDateTime requestedAt) {
+        this.requestedAt = requestedAt;
+    }
 }
