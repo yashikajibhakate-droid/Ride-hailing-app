@@ -4,6 +4,7 @@ import java.sql.Connection;
 
 import com.ride.config.DatabaseConnection;
 import com.ride.controller.RiderController;
+import com.ride.controller.DriverController;
 
 import io.javalin.Javalin;
 
@@ -23,7 +24,7 @@ public class Main {
 
 
         RiderController.register(app);
-        // DriverController.register(app);
+        DriverController.register(app);
 
         System.out.println("🚖 Ride Hailing API running on port 5000");
     }

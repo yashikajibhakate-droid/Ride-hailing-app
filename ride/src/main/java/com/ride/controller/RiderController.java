@@ -38,11 +38,11 @@ public class RiderController {
             ctx.json(riderService.getRideStatus(rideId));
         });
 
-        // app.post("/rider/ride/{rideId}/cancel", ctx -> {
-        //     int rideId = Integer.parseInt(ctx.pathParam("rideId"));
-        //     int riderId = ctx.queryParamAsClass("riderId", Integer.class).get();
-        //     riderService.cancelRide(rideId, riderId);
-        //     ctx.result("Ride cancelled");
-        // });
+        app.post("/rider/ride/{rideId}/cancel", ctx -> {
+            int rideId = Integer.parseInt(ctx.pathParam("rideId"));
+            int riderId = ctx.queryParamAsClass("riderId", Integer.class).get();
+            riderService.cancelRide(rideId, riderId);
+            ctx.result("Ride cancelled");
+        });
     }
 }
