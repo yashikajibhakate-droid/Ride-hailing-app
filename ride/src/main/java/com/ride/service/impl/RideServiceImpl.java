@@ -19,37 +19,7 @@ public class RideServiceImpl implements RideService {
         return rideRepository.save(ride);
     }
 
-    @Override
-    public boolean acceptRide(int rideId, int driverId) {
-        return rideRepository.acceptRide(rideId, driverId);
-    }
-
-    @Override
-    public void beginRide(int rideId, int driverId,
-                          double lat, double lon) {
-
-        boolean started =
-                rideRepository.beginRide(rideId, driverId);
-
-        if (!started) {
-            throw new IllegalStateException(
-                "Ride cannot be started");
-        }
-    }
-
-    @Override
-    public void endRide(int rideId, int driverId,
-                        double lat, double lon) {
-
-        boolean ended =
-                rideRepository.endRide(rideId, driverId);
-
-        if (!ended) {
-            throw new IllegalStateException(
-                "Ride cannot be completed");
-        }
-    }
-
+  
     @Override
     public void riderCancelRide(int rideId, int riderId) {
 
@@ -62,18 +32,7 @@ public class RideServiceImpl implements RideService {
         }
     }
 
-    @Override
-    public void driverCancelRide(int rideId, int driverId) {
-
-        boolean canceled =
-                rideRepository.driverCancelRide(rideId, driverId);
-
-        if (!canceled) {
-            throw new IllegalStateException(
-                "Ride cannot be cancelled by driver");
-        }
-    }
-
+   
     @Override
     public Ride getRideById(int rideId) {
         return rideRepository.findById(rideId);

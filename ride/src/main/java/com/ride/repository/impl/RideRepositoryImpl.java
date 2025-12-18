@@ -47,45 +47,45 @@ public class RideRepositoryImpl implements RideRepository {
         }
     }
 
-    @Override
-    public boolean acceptRide(int rideId, int driverId) {
+    // @Override
+    // public boolean acceptRide(int rideId, int driverId) {
 
-        String sql = """
-            UPDATE ride
-            SET driver_id = ?, status = 'ACCEPTED', accepted_at = NOW()
-            WHERE ride_id = ? AND status = 'REQUESTED'
-        """;
+    //     String sql = """
+    //         UPDATE ride
+    //         SET driver_id = ?, status = 'ACCEPTED', accepted_at = NOW()
+    //         WHERE ride_id = ? AND status = 'REQUESTED'
+    //     """;
 
-        return executeUpdate(sql, driverId, rideId);
-    }
+    //     return executeUpdate(sql, driverId, rideId);
+    // }
 
-    @Override
-    public boolean beginRide(int rideId, int driverId) {
+    // @Override
+    // public boolean beginRide(int rideId, int driverId) {
 
-        String sql = """
-            UPDATE ride
-            SET status = 'IN_PROGRESS', started_at = NOW()
-            WHERE ride_id = ?
-              AND driver_id = ?
-              AND status = 'ACCEPTED'
-        """;
+    //     String sql = """
+    //         UPDATE ride
+    //         SET status = 'IN_PROGRESS', started_at = NOW()
+    //         WHERE ride_id = ?
+    //           AND driver_id = ?
+    //           AND status = 'ACCEPTED'
+    //     """;
 
-        return executeUpdate(sql, rideId, driverId);
-    }
+    //     return executeUpdate(sql, rideId, driverId);
+    // }
 
-    @Override
-    public boolean endRide(int rideId, int driverId) {
+    // @Override
+    // public boolean endRide(int rideId, int driverId) {
 
-        String sql = """
-            UPDATE ride
-            SET status = 'COMPLETED', ended_at = NOW()
-            WHERE ride_id = ?
-              AND driver_id = ?
-              AND status = 'IN_PROGRESS'
-        """;
+    //     String sql = """
+    //         UPDATE ride
+    //         SET status = 'COMPLETED', ended_at = NOW()
+    //         WHERE ride_id = ?
+    //           AND driver_id = ?
+    //           AND status = 'IN_PROGRESS'
+    //     """;
 
-        return executeUpdate(sql, rideId, driverId);
-    }
+    //     return executeUpdate(sql, rideId, driverId);
+    // }
 
     @Override
     public boolean riderCancelRide(int rideId, int riderId) {
@@ -101,19 +101,19 @@ public class RideRepositoryImpl implements RideRepository {
         return executeUpdate(sql, rideId, riderId);
     }
 
-    @Override
-    public boolean driverCancelRide(int rideId, int driverId) {
+    // @Override
+    // public boolean driverCancelRide(int rideId, int driverId) {
 
-        String sql = """
-            UPDATE ride
-            SET status = 'DRIVER_CANCELED'
-            WHERE ride_id = ?
-              AND driver_id = ?
-              AND status = 'ACCEPTED'
-        """;
+    //     String sql = """
+    //         UPDATE ride
+    //         SET status = 'DRIVER_CANCELED'
+    //         WHERE ride_id = ?
+    //           AND driver_id = ?
+    //           AND status = 'ACCEPTED'
+    //     """;
 
-        return executeUpdate(sql, rideId, driverId);
-    }
+    //     return executeUpdate(sql, rideId, driverId);
+    // }
 
     @Override
     public Ride findById(int rideId) {
