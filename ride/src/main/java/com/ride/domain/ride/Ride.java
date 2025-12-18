@@ -10,6 +10,8 @@ public class Ride {
     private String dropoff;
     Location pickupLocation;
     Location dropoffLocation;
+    public int otp;
+    public String bookingFor;
 
     int driverId;
     private int riderId;
@@ -136,5 +138,18 @@ public class Ride {
 
     public void setRequestedAt(LocalDateTime requestedAt) {
         this.requestedAt = requestedAt;
+    }
+
+    public void setOtp(int otp) {
+        this.otp = otp;
+    }
+    public void setBookingFor(String bookingFor) {
+        this.bookingFor = bookingFor;
+    }
+    public int getOtp() {
+        return otp;
+    }
+    public String getBookingFor() {
+        return bookingFor;
     }
 }
