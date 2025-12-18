@@ -143,7 +143,6 @@ public class RideRepositoryImpl implements RideRepository {
         }
     }
 
-    // 🔹 Utility method
     private boolean executeUpdate(String sql, Object... params) {
 
         try (Connection conn = DatabaseConnection.getConnection();

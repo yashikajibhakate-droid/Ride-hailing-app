@@ -37,12 +37,10 @@ public class Ride {
     }
 
     public Ride() {
-        //TODO Auto-generated constructor stub
     }
 
     public Ride(int int1, int int2, String string, String string2, Location location, Location location2,
             RideStatus valueOf) {
-        //TODO Auto-generated constructor stub
     }
 
     public RideStatus getStatus() {

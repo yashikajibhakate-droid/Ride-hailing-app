@@ -12,11 +12,5 @@ public class ServiceFactory {
         );
     }
 
-    public static DriverServiceImpl getDriverService() {
-        return new DriverServiceImpl(
-                new DriverRepositoryImpl(),
-                new RideRepositoryImpl(),
-                new DriverLocationRepositoryImpl()
-        );
-    }
+  
 }
