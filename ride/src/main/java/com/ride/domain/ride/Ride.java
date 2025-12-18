@@ -10,8 +10,8 @@ public class Ride {
     private String dropoff;
     Location pickupLocation;
     Location dropoffLocation;
-    public int otp;
-    public String bookingFor;
+    private int otp;
+    private String bookingFor;
 
     int driverId;
     private int riderId;
