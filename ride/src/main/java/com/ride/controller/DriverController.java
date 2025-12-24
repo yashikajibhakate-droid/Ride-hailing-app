@@ -46,6 +46,13 @@ public class DriverController {
             ctx.json(driverService.acceptRide(rideId, driverId));
         });
 
+        app.post("/driver/{id}/ride/{rideId}/cancel", ctx -> {
+            int driverId = Integer.parseInt(ctx.pathParam("id"));
+            int rideId = Integer.parseInt(ctx.pathParam("rideId"));
+            driverService.driverCancelRide(rideId, driverId);
+            ctx.result("Ride cancelled");
+        }); 
+
         app.post("/driver/{id}/ride/{rideId}/begin", ctx -> {
             int driverId = Integer.parseInt(ctx.pathParam("id"));
             int rideId = Integer.parseInt(ctx.pathParam("rideId"));

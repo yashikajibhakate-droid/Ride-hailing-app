@@ -15,6 +15,8 @@ public interface DriverService {
 
     boolean acceptRide(int rideId, int driverId);
 
+    void driverCancelRide(int rideId, int driverId);
+
     void beginRide(int rideId, int driverId, Location location);
 
     void endRide(int rideId, int driverId, Location location);

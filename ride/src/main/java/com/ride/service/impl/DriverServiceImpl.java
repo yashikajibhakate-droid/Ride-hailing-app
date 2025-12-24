@@ -73,4 +73,15 @@ public class DriverServiceImpl implements DriverService {
     return driverRepository.save(req.name, req.phone, req.email);
 }
 
+@Override
+    public void driverCancelRide(int rideId, int driverId) {
+        boolean canceled =
+                rideRepository.driverCancelRide(rideId, driverId);
+
+        if (!canceled) {
+            throw new IllegalStateException(
+                "Ride cannot be cancelled by driver");
+        }
+    }
+
 }

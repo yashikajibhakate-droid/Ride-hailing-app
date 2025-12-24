@@ -1,0 +1,39 @@
+# =====================
+# Java
+# =====================
+*.class
+*.log
+
+# =====================
+# Maven
+# =====================
+target/
+*.jar
+*.war
+*.ear
+
+
+
+# =====================
+# VS Code
+# =====================
+.vscode/
+
+# =====================
+# OS files
+# =====================
+.DS_Store
+Thumbs.db
+
+# =====================
+# Environment / Secrets
+# =====================
+.env
+application-local.yml
+application-local.properties
+
+# =====================
+# Database / Temp
+# =====================
+*.db
+*.sqlite
