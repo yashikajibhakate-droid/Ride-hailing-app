@@ -17,4 +17,5 @@ public interface DriverRepository {
     Location getCurrentLocation(int driverId);
 
     List<Driver> findAvailableDriversNear(Location pickupLocation, double radiusMeters);
+    int save(String name, String phone, String email);
 }

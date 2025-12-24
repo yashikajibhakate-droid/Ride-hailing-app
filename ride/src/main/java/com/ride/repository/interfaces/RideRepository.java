@@ -22,7 +22,7 @@ public interface RideRepository {
 
     Ride getRideStatus(int rideId);
 Ride getRideById(int rideId);
-    List<Ride> findAvailableRidesForDriver(int driverId); // ✅ ADD THIS
+    List<Ride> findAvailableRidesForDriver(int driverId); 
 
 
 

@@ -3,6 +3,7 @@ package com.ride.service.impl;
 import com.ride.domain.driver.DriverStatus;
 import com.ride.domain.ride.Location;
 import com.ride.domain.ride.Ride;
+import com.ride.dto.request.DriverCreateRequest;
 import com.ride.repository.interfaces.DriverLocationRepository;
 import com.ride.repository.interfaces.DriverRepository;
 import com.ride.repository.interfaces.RideRepository;
@@ -26,10 +27,9 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     public void updateDriverLocation(int driverId, Location location) {
-        locationRepository.updateLocation(
+        driverRepository.updateLocation(
                 driverId,
-                location.getLat(),
-                location.getLon()
+                location
         );
     }
 
@@ -67,4 +67,10 @@ public class DriverServiceImpl implements DriverService {
     public void updateStatus(int driverId, DriverStatus status) {
         driverRepository.updateStatus(driverId, status);
     }
+
+    @Override
+    public int registerDriver(DriverCreateRequest req) {
+    return driverRepository.save(req.name, req.phone, req.email);
+}
+
 }

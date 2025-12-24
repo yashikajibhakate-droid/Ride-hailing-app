@@ -10,7 +10,34 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.crypto.Data;
+
 public class DriverRepositoryImpl implements DriverRepository {
+
+    @Override
+   public int save(String name, String phone, String email) {
+    String sql =
+        "INSERT INTO driver (name, phone, email) " +
+        "VALUES (?, ?, ?) " +
+        "RETURNING driver_id";
+
+    try (Connection conn = DatabaseConnection.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+
+        ps.setString(1, name);
+        ps.setString(2, phone);
+        ps.setString(3, email);
+
+        ResultSet rs = ps.executeQuery();
+        rs.next();
+        return rs.getInt("driver_id");
+
+    } catch (SQLException e) {
+        throw new RuntimeException("Error saving driver", e);
+    }
+}
+
+
 
     @Override
     public Driver findById(int driverId) {

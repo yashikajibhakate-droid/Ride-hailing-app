@@ -1,7 +1,10 @@
 package com.ride.controller;
 
+import java.util.Map;
+
 import com.ride.domain.driver.DriverStatus;
-import com.ride.domain.location.Location;
+import com.ride.domain.ride.Location;
+import com.ride.dto.request.DriverCreateRequest;
 import com.ride.service.impl.DriverServiceImpl;
 import io.javalin.Javalin;
 
@@ -10,6 +13,12 @@ public class DriverController {
     public static void register(Javalin app) {
 
         DriverServiceImpl driverService = ServiceFactory.getDriverService();
+
+        app.post("/driver/register", ctx -> {
+            DriverCreateRequest req = ctx.bodyAsClass(DriverCreateRequest.class);
+            int driverId = driverService.registerDriver(req);
+            ctx.json(Map.of("driverId", driverId));
+        });
 
         app.post("/driver/{id}/status", ctx -> {
             int driverId = Integer.parseInt(ctx.pathParam("id"));

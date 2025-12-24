@@ -3,6 +3,7 @@ package com.ride.service.interfaces;
 import com.ride.domain.driver.DriverStatus;
 import com.ride.domain.ride.Location;
 import com.ride.domain.ride.Ride;
+import com.ride.dto.request.DriverCreateRequest;
 
 import java.util.List;
 
@@ -19,4 +20,5 @@ public interface DriverService {
     void endRide(int rideId, int driverId, Location location);
 
     void updateStatus(int driverId, DriverStatus status);
+    int registerDriver(DriverCreateRequest req);
 }

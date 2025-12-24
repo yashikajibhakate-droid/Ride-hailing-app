@@ -24,7 +24,7 @@ public class Main {
 
 
         RiderController.register(app);
-        // DriverController.register(app);
+        DriverController.register(app);
 
         System.out.println("🚖 Ride Hailing API running on port 5000");
     }

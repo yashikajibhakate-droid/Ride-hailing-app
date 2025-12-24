@@ -12,7 +12,7 @@ public class RiderServiceImpl implements RiderService {
     private final RiderRepository riderRepository;
 
     public RiderServiceImpl(RideRepository rideRepository,
-                            RiderRepository riderRepository) {
+            RiderRepository riderRepository) {
         this.rideRepository = rideRepository;
         this.riderRepository = riderRepository;
     }
@@ -28,11 +28,12 @@ public class RiderServiceImpl implements RiderService {
         validateRider(riderId);
 
         Ride ride = new Ride(
-                riderId,
                 pickup,
                 dropoff,
                 pickupLocation,
-                dropoffLocation, riderId
+                dropoffLocation,
+                riderId
+
         );
 
         rideRepository.save(ride);
