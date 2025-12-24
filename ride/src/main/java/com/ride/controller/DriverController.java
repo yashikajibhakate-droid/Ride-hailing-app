@@ -52,6 +52,7 @@ public class DriverController {
             double lat = ctx.queryParamAsClass("lat", Double.class).get();
             double lon = ctx.queryParamAsClass("lon", Double.class).get();
             driverService.beginRide(rideId, driverId, new Location(lat, lon));
+            driverService.updateDriverLocation(driverId, new Location(lat, lon));
             ctx.result("Ride started");
         });
 

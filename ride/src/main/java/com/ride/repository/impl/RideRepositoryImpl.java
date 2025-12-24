@@ -52,7 +52,7 @@ public class RideRepositoryImpl implements RideRepository {
 
         String sql = """
                     UPDATE ride
-                    SET driver_id = ?, status = 'ACCEPTED', accepted_at = NOW()
+                    SET driver_id = ?, status = 'ACCEPTED', ride_accepted_at = NOW()
                     WHERE ride_id = ? AND status = 'REQUESTED'
                 """;
 
@@ -64,7 +64,7 @@ public class RideRepositoryImpl implements RideRepository {
 
         String sql = """
                     UPDATE ride
-                    SET status = 'IN_PROGRESS', started_at = NOW()
+                    SET status = 'IN_PROGRESS'
                     WHERE ride_id = ?
                       AND driver_id = ?
                       AND status = 'ACCEPTED'

@@ -91,10 +91,7 @@ public class Ride {
 }
 
 
-    /* =======================
-       Required No-Args Constructor
-       (Jackson / frameworks)
-       ======================= */
+   
     public Ride() {}
 
     /* =======================
