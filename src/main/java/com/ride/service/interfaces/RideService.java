@@ -4,7 +4,7 @@ import com.ride.domain.ride.Ride;
 
 public interface RideService {
 
-    int requestRide(Ride ride);
+    Ride requestRide(Ride ride);
 
     boolean acceptRide(int rideId, int driverId);
 

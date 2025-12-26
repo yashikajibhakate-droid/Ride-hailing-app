@@ -13,7 +13,7 @@ import java.util.List;
 public class RideRepositoryImpl implements RideRepository {
 
     @Override
-    public int save(Ride ride) {
+    public Ride save(Ride ride) {
 
         String sql = """
                     INSERT INTO ride (
@@ -40,7 +40,11 @@ public class RideRepositoryImpl implements RideRepository {
 
             ResultSet rs = ps.executeQuery();
             rs.next();
-            return rs.getInt("ride_id");
+
+            int generatedRideId = rs.getInt("ride_id");
+            ride.setRideId(generatedRideId);
+
+            return ride;
 
         } catch (SQLException e) {
             throw new RuntimeException("Failed to create ride", e);
@@ -207,7 +211,7 @@ public class RideRepositoryImpl implements RideRepository {
                         rs.getTimestamp("ride_accepted_at") != null
                                 ? rs.getTimestamp("ride_accepted_at").toLocalDateTime()
                                 : null,
-                       
+
                         rs.getTimestamp("ride_ended_at") != null
                                 ? rs.getTimestamp("ride_ended_at").toLocalDateTime()
                                 : null);
@@ -292,8 +296,6 @@ public class RideRepositoryImpl implements RideRepository {
                 if (acceptedTs != null) {
                     ride.setAcceptedAt(acceptedTs.toLocalDateTime());
                 }
-
-              
 
                 Timestamp endedTs = rs.getTimestamp("ride_ended_at");
                 if (endedTs != null) {

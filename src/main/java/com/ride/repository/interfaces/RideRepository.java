@@ -6,7 +6,7 @@ import com.ride.domain.ride.Ride;
 
 public interface RideRepository {
 
-    int save(Ride ride);
+    Ride save(Ride ride);
 
     boolean acceptRide(int rideId, int driverId);
 
@@ -21,9 +21,9 @@ public interface RideRepository {
     Ride findById(int rideId);
 
     Ride getRideStatus(int rideId);
-Ride getRideById(int rideId);
-    List<Ride> findAvailableRidesForDriver(int driverId); 
 
+    Ride getRideById(int rideId);
 
+    List<Ride> findAvailableRidesForDriver(int driverId);
 
 }

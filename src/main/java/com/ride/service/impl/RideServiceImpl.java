@@ -14,7 +14,7 @@ public class RideServiceImpl implements RideService {
     }
 
     @Override
-    public int requestRide(Ride ride) {
+    public Ride requestRide(Ride ride) {
         ride.setStatus(RideStatus.REQUESTED);
         return rideRepository.save(ride);
     }

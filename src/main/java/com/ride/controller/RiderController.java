@@ -3,6 +3,8 @@ package com.ride.controller;
 import java.util.Map;
 
 import com.ride.domain.ride.Location;
+import com.ride.domain.ride.Ride;
+import com.ride.dto.request.CreateRideRequestDTO;
 import com.ride.dto.request.RiderCreateRequest;
 import com.ride.service.impl.RiderServiceImpl;
 import io.javalin.Javalin;
@@ -14,32 +16,18 @@ public class RiderController {
         RiderServiceImpl riderService = ServiceFactory.getRiderService();
 
         app.post("/rider/register", ctx -> {
-           RiderCreateRequest req = ctx.bodyAsClass(RiderCreateRequest.class);
+            RiderCreateRequest req = ctx.bodyAsClass(RiderCreateRequest.class);
             int riderId = riderService.registerRider(req);
             ctx.json(Map.of("riderId", riderId));
         });
 
-        app.post("/rider/ride", ctx -> {
+        app.post("/ride", ctx -> {
 
-            int riderId = ctx.queryParamAsClass("riderId", Integer.class).get();
-            String pickup = ctx.queryParam("pickup");
-            String dropoff = ctx.queryParam("dropoff");
+            CreateRideRequestDTO request = ctx.bodyAsClass(CreateRideRequestDTO.class);
 
-            double pLat = ctx.queryParamAsClass("pickupLat", Double.class).get();
-            double pLon = ctx.queryParamAsClass("pickupLon", Double.class).get();
+            Ride ride = riderService.requestRide(request);
 
-            double dLat = ctx.queryParamAsClass("dropLat", Double.class).get();
-            double dLon = ctx.queryParamAsClass("dropLon", Double.class).get();
-
-            ctx.json(
-                riderService.requestRide(
-                    riderId,
-                    pickup,
-                    dropoff,
-                    new Location(pLat, pLon),
-                    new Location(dLat, dLon)
-                )
-            );
+            ctx.status(201).json(ride);
         });
 
         app.get("/rider/ride/{rideId}", ctx -> {

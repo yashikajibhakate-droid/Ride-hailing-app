@@ -2,6 +2,7 @@ package com.ride.service.impl;
 
 import com.ride.domain.ride.Location;
 import com.ride.domain.ride.Ride;
+import com.ride.dto.request.CreateRideRequestDTO;
 import com.ride.dto.request.RiderCreateRequest;
 import com.ride.repository.interfaces.RideRepository;
 import com.ride.repository.interfaces.RiderRepository;
@@ -26,21 +27,16 @@ public class RiderServiceImpl implements RiderService {
 
 
     @Override
-    public Ride requestRide(
-            int riderId,
-            String pickup,
-            String dropoff,
-            Location pickupLocation,
-            Location dropoffLocation) {
+    public Ride requestRide(CreateRideRequestDTO request) {
 
-        validateRider(riderId);
+        validateRider(request.riderId);
 
         Ride ride = new Ride(
-                pickup,
-                dropoff,
-                pickupLocation,
-                dropoffLocation,
-                riderId
+                request.pickup,
+                request.dropoff,
+                request.pickupLocation,
+                request.dropoffLocation,
+                request.riderId
 
         );
 

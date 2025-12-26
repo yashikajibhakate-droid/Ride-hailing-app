@@ -2,6 +2,7 @@ package com.ride.service.interfaces;
 
 import com.ride.domain.ride.Location;
 import com.ride.domain.ride.Ride;
+import com.ride.dto.request.CreateRideRequestDTO;
 import com.ride.dto.request.RiderCreateRequest;
 
 public interface RiderService {
@@ -9,11 +10,7 @@ public interface RiderService {
 
 
     Ride requestRide(
-            int riderId,
-            String pickup,
-            String dropoff,
-            Location pickupLocation,
-            Location dropoffLocation
+            CreateRideRequestDTO request
     );
 
     Ride getRideStatus(int rideId);
