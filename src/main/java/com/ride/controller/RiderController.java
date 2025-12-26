@@ -32,7 +32,7 @@ public class RiderController {
 
         app.get("/rider/ride/{rideId}", ctx -> {
             int rideId = Integer.parseInt(ctx.pathParam("rideId"));
-            ctx.json(riderService.getRideStatus(rideId));
+            ctx.json(riderService.getRideDetails(rideId));
         });
 
         app.post("/rider/ride/{rideId}/cancel", ctx -> {

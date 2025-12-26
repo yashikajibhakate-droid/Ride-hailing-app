@@ -311,7 +311,7 @@ public class RideRepositoryImpl implements RideRepository {
     }
 
     @Override
-    public Ride getRideStatus(int rideId) {
+    public Ride getRideDetails(int rideId) {
         return getRideById(rideId);
     }
 

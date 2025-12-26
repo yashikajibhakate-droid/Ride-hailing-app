@@ -20,7 +20,7 @@ public interface RideRepository {
 
     Ride findById(int rideId);
 
-    Ride getRideStatus(int rideId);
+    Ride getRideDetails(int rideId);
 
     Ride getRideById(int rideId);
 

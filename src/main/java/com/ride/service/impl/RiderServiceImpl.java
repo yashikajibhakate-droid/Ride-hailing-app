@@ -45,7 +45,7 @@ public class RiderServiceImpl implements RiderService {
     }
 
     @Override
-    public Ride getRideStatus(int rideId) {
+    public Ride getRideDetails(int rideId) {
         return rideRepository.getRideById(rideId);
     }
 
