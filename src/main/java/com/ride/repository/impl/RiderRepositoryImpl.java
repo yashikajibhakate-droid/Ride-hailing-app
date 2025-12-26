@@ -10,6 +10,26 @@ import java.sql.ResultSet;
 
 public class RiderRepositoryImpl implements RiderRepository {
 
+
+    @Override
+    public int saveRider(String name, String phone_number, String email) {
+        String sql =
+            "INSERT INTO rider (name, phone_number, email) " +
+            "VALUES (?, ?, ?) " +
+            "RETURNING rider_id";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, name);
+            ps.setString(2, phone_number);
+            ps.setString(3, email);
+            ResultSet rs = ps.executeQuery();
+            rs.next();
+            return rs.getInt("rider_id");
+        } catch (Exception e) {
+            throw new RuntimeException("Error saving rider", e);
+        }
+    }
+
     @Override
     public Rider findById(int riderId) {
         String sql = "SELECT rider_id, name, phone, email FROM rider WHERE rider_id = ?";

@@ -1,6 +1,9 @@
 package com.ride.controller;
 
+import java.util.Map;
+
 import com.ride.domain.ride.Location;
+import com.ride.dto.request.RiderCreateRequest;
 import com.ride.service.impl.RiderServiceImpl;
 import io.javalin.Javalin;
 
@@ -9,6 +12,12 @@ public class RiderController {
     public static void register(Javalin app) {
 
         RiderServiceImpl riderService = ServiceFactory.getRiderService();
+
+        app.post("/rider/register", ctx -> {
+           RiderCreateRequest req = ctx.bodyAsClass(RiderCreateRequest.class);
+            int riderId = riderService.registerRider(req);
+            ctx.json(Map.of("riderId", riderId));
+        });
 
         app.post("/rider/ride", ctx -> {
 

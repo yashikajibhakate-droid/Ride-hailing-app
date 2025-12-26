@@ -2,6 +2,7 @@ package com.ride.service.impl;
 
 import com.ride.domain.ride.Location;
 import com.ride.domain.ride.Ride;
+import com.ride.dto.request.RiderCreateRequest;
 import com.ride.repository.interfaces.RideRepository;
 import com.ride.repository.interfaces.RiderRepository;
 import com.ride.service.interfaces.RiderService;
@@ -16,6 +17,13 @@ public class RiderServiceImpl implements RiderService {
         this.rideRepository = rideRepository;
         this.riderRepository = riderRepository;
     }
+
+
+    @Override
+    public int registerRider(RiderCreateRequest req) {
+        return riderRepository.saveRider(req.name, req.phone_number, req.email);
+    }
+
 
     @Override
     public Ride requestRide(
