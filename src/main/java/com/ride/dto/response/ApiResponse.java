@@ -2,11 +2,11 @@ package com.ride.dto.response;
 
 public class ApiResponse {
 
-    public boolean success;
-    public String message;
+     public final String message;
+    public final int status;
 
-    public ApiResponse(boolean success, String message) {
-        this.success = success;
-        this.message = message;
+    public ApiResponse(String message, int status) {
+       this.message = message;
+        this.status = status;
     }
 }
