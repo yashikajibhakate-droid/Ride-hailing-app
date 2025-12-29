@@ -3,6 +3,8 @@ package com.ride.service.impl;
 import com.ride.domain.driver.DriverStatus;
 import com.ride.domain.ride.Location;
 import com.ride.domain.ride.Ride;
+import com.ride.domain.ride.RideStateMachine;
+import com.ride.domain.ride.RideStatus;
 import com.ride.dto.request.DriverCreateRequest;
 import com.ride.repository.interfaces.DriverLocationRepository;
 import com.ride.repository.interfaces.DriverRepository;
@@ -16,72 +18,108 @@ public class DriverServiceImpl implements DriverService {
     private final DriverRepository driverRepository;
     private final RideRepository rideRepository;
     private final DriverLocationRepository locationRepository;
+    private final RideStateMachine stateMachine = new RideStateMachine();
 
     public DriverServiceImpl(DriverRepository driverRepository,
-                             RideRepository rideRepository,
-                             DriverLocationRepository locationRepository) {
+            RideRepository rideRepository,
+            DriverLocationRepository locationRepository) {
         this.driverRepository = driverRepository;
         this.rideRepository = rideRepository;
         this.locationRepository = locationRepository;
     }
 
     @Override
-    public void updateDriverLocation(int driverId, Location location) {
-        driverRepository.updateLocation(
-                driverId,
-                location
-        );
+    public Long registerDriver(DriverCreateRequest req) {
+        return driverRepository.save(req.name, req.phone, req.email, DriverStatus.OFFLINE);
     }
 
     @Override
-    public List<Ride> getAvailableRides(int driverId) {
-        return rideRepository.findAvailableRidesForDriver(driverId);
-    }
-
-    @Override
-    public boolean acceptRide(int rideId, int driverId) {
-        return rideRepository.acceptRide(rideId, driverId);
-    }
-
-    @Override
-    public void beginRide(int rideId, int driverId, Location location) {
-        rideRepository.beginRide(
-                rideId,
-                driverId
-                // location.getLat(),
-                // location.getLon()
-        );
-    }
-
-    @Override
-    public void endRide(int rideId, int driverId, Location location) {
-        rideRepository.endRide(
-                rideId,
-                driverId
-                // location.getLat(),
-                // location.getLon()
-        );
-    }
-
-    @Override
-    public void updateStatus(int driverId, DriverStatus status) {
+    public void updateStatus(Long driverId, DriverStatus status) {
         driverRepository.updateStatus(driverId, status);
     }
 
     @Override
-    public int registerDriver(DriverCreateRequest req) {
-    return driverRepository.save(req.name, req.phone, req.email);
-}
-
-@Override
-    public void driverCancelRide(int rideId, int driverId) {
-        boolean canceled =
-                rideRepository.driverCancelRide(rideId, driverId);
-
-        if (!canceled) {
-            throw new IllegalStateException(
-                "Ride cannot be cancelled by driver");
-        }
+    public void updateDriverLocation(Long driverId, Location location) {
+        driverRepository.updateLocation(driverId, location);
     }
 
+    @Override
+    public List<Ride> getAvailableRides(Long driverId) {
+        return rideRepository.findAvailableRidesForDriver(driverId);
+    }
+
+    @Override
+    public boolean acceptRide(Long rideId, Long driverId) {
+
+        Ride ride = rideRepository.getRideById(rideId);
+        DriverStatus status = driverRepository.getDriverStatus(driverId);
+
+        if (status != DriverStatus.ONLINE) {
+            throw new IllegalStateException(
+                    "Driver must be ONLINE to accept a ride");
+        }
+
+        stateMachine.onDriverAccept(ride);
+
+        ride.setDriverId(driverId);
+
+        return rideRepository.acceptRide(rideId, driverId);
+    }
+
+    @Override
+    public void beginRide(Long rideId, Long driverId, Location location) {
+
+        Ride ride = rideRepository.getRideById(rideId);
+
+        if (!driverId.equals(ride.getDriverId())) {
+            throw new IllegalArgumentException("Unauthorized driver");
+        }
+
+        // 🔥 lifecycle enforcement
+        stateMachine.onStart(ride);
+
+        rideRepository.beginRide(rideId, driverId);
+        driverRepository.updateLocation(driverId, location);
+    }
+
+    @Override
+    public void endRide(Long rideId, Long driverId, Location location) {
+
+        Ride ride = rideRepository.getRideById(rideId);
+
+        if (!driverId.equals(ride.getDriverId())) {
+            throw new IllegalArgumentException("Unauthorized driver");
+        }
+
+        if (ride.getStatus() != RideStatus.IN_PROGRESS) {
+            throw new IllegalStateException("Ride is not in progress");
+        }
+
+         if (!stateMachine.isAtDropLocation(location, ride.getDropoffLocation())) {
+        throw new IllegalStateException(
+            "Cannot end ride before reaching drop-off location"
+        );
+    }
+
+        // 🔥 lifecycle enforcement
+        stateMachine.onComplete(ride);
+
+        rideRepository.endRide(rideId, driverId);
+        driverRepository.updateLocation(driverId, location);
+    }
+
+    @Override
+    public void driverCancelRide(Long rideId, Long driverId) {
+
+        Ride ride = rideRepository.getRideById(rideId);
+
+        if (!driverId.equals(ride.getDriverId())) {
+            throw new IllegalArgumentException("Unauthorized driver");
+        }
+
+        // 🔥 lifecycle enforcement
+        stateMachine.onDriverCancel(ride);
+
+        rideRepository.driverCancelRide(rideId, driverId);
+    }
 }

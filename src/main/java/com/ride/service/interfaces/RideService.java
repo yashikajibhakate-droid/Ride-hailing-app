@@ -4,18 +4,18 @@ import com.ride.domain.ride.Ride;
 
 public interface RideService {
 
-    Ride requestRide(Ride ride);
+    // Ride requestRide(Ride ride);
 
-    boolean acceptRide(int rideId, int driverId);
+    // boolean acceptRide(Long rideId, Long driverId);
 
-    void beginRide(int rideId, int driverId, double lat, double lon);
+    // void beginRide(Long rideId, Long driverId, double lat, double lon);
 
-    void endRide(int rideId, int driverId, double lat, double lon);
+    // void endRide(Long rideId, Long driverId, double lat, double lon);
 
-    void riderCancelRide(int rideId, int riderId);
+    // void riderCancelRide(Long rideId, Long riderId);
 
-    void driverCancelRide(int rideId, int driverId);
+    // void driverCancelRide(Long rideId, Long driverId);
 
-    Ride getRideById(int rideId);
+    Ride getRideById(Long rideId);
     
 }

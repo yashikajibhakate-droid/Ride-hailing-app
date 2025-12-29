@@ -4,9 +4,9 @@ import com.ride.domain.rider.Rider;
 
 public interface RiderRepository {
 
-    Rider findById(int riderId);
+    Rider findById(Long riderId);
 
-    boolean existsById(int riderId);
+    boolean existsById(Long riderId);
 
-    int saveRider(String name, String phone, String email);
+    Long saveRider(String name, String phone, String email);
 }

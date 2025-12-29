@@ -15,10 +15,10 @@ import javax.xml.crypto.Data;
 public class DriverRepositoryImpl implements DriverRepository {
 
     @Override
-   public int save(String name, String phone, String email) {
+   public Long save(String name, String phone, String email, DriverStatus status) {
     String sql =
-        "INSERT INTO driver (name, phone, email) " +
-        "VALUES (?, ?, ?) " +
+        "INSERT INTO driver (name, phone, email, status) " +
+        "VALUES (?, ?, ?, ?) " +
         "RETURNING driver_id";
 
     try (Connection conn = DatabaseConnection.getConnection();
@@ -27,10 +27,11 @@ public class DriverRepositoryImpl implements DriverRepository {
         ps.setString(1, name);
         ps.setString(2, phone);
         ps.setString(3, email);
+        ps.setString(4, status.name());
 
         ResultSet rs = ps.executeQuery();
         rs.next();
-        return rs.getInt("driver_id");
+        return rs.getLong("driver_id");
 
     } catch (SQLException e) {
         throw new RuntimeException("Error saving driver", e);
@@ -40,18 +41,18 @@ public class DriverRepositoryImpl implements DriverRepository {
 
 
     @Override
-    public Driver findById(int driverId) {
+    public Driver findById(Long driverId) {
         String sql = "SELECT * FROM driver WHERE driver_id = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setInt(1, driverId);
+            ps.setLong(1, driverId);
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
                 Driver driver = new Driver(
-                        rs.getInt("driver_id"),
+                        rs.getLong("driver_id"),
                         rs.getString("name"),
                         rs.getString("phone"),
                         rs.getString("license_no"),
@@ -73,14 +74,37 @@ public class DriverRepositoryImpl implements DriverRepository {
     }
 
     @Override
-    public void updateStatus(int driverId, DriverStatus status) {
+public DriverStatus getDriverStatus(Long driverId) {
+    String sql = "SELECT status FROM driver WHERE driver_id = ?";
+
+    try (Connection conn = DatabaseConnection.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+
+        ps.setLong(1, driverId);
+
+        ResultSet rs = ps.executeQuery();
+        if (!rs.next()) {
+            throw new IllegalArgumentException("Driver not found");
+        }
+        System.out.println("Driver status: " + rs.getString("status"));
+
+        return DriverStatus.valueOf(rs.getString("status"));
+
+    } catch (SQLException e) {
+        throw new RuntimeException("Failed to fetch driver status", e);
+    }
+}
+
+
+    @Override
+    public void updateStatus(Long driverId, DriverStatus status) {
         String sql = "UPDATE driver SET status = ? WHERE driver_id = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, status.name());
-            ps.setInt(2, driverId);
+            ps.setLong(2, driverId);
             ps.executeUpdate();
 
         } catch (Exception e) {
@@ -89,7 +113,7 @@ public class DriverRepositoryImpl implements DriverRepository {
     }
 
     @Override
-    public void updateLocation(int driverId, Location location) {
+    public void updateLocation(Long driverId, Location location) {
         String sql = """
             INSERT INTO driver_location (driver_id, lat, lon)
             VALUES (?, ?, ?)
@@ -100,7 +124,7 @@ public class DriverRepositoryImpl implements DriverRepository {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setInt(1, driverId);
+            ps.setLong(1, driverId);
             ps.setDouble(2, location.getLat());
             ps.setDouble(3, location.getLon());
             ps.setDouble(4, location.getLat());
@@ -114,13 +138,13 @@ public class DriverRepositoryImpl implements DriverRepository {
     }
 
     @Override
-    public Location getCurrentLocation(int driverId) {
+    public Location getCurrentLocation(Long driverId) {
         String sql = "SELECT lat, lon FROM driver_location WHERE driver_id = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setInt(1, driverId);
+            ps.setLong(1, driverId);
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
@@ -145,7 +169,7 @@ public class DriverRepositoryImpl implements DriverRepository {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 drivers.add(new Driver(
-                        rs.getInt("driver_id"),
+                        rs.getLong("driver_id"),
                         rs.getString("name"),
                         rs.getString("phone"),
                         rs.getString("license_no"),

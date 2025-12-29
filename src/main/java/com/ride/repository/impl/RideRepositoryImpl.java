@@ -29,7 +29,7 @@ public class RideRepositoryImpl implements RideRepository {
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setInt(1, ride.getRiderId());
+            ps.setLong(1, ride.getRiderId());
             ps.setString(2, ride.getPickup());
             ps.setString(3, ride.getDropoff());
             ps.setDouble(4, ride.getPickupLocation().getLat());
@@ -41,7 +41,7 @@ public class RideRepositoryImpl implements RideRepository {
             ResultSet rs = ps.executeQuery();
             rs.next();
 
-            int generatedRideId = rs.getInt("ride_id");
+            Long generatedRideId = rs.getLong("ride_id");
             ride.setRideId(generatedRideId);
 
             return ride;
@@ -52,7 +52,7 @@ public class RideRepositoryImpl implements RideRepository {
     }
 
     @Override
-    public boolean acceptRide(int rideId, int driverId) {
+    public boolean acceptRide(Long rideId, Long driverId) {
 
         String sql = """
                     UPDATE ride
@@ -64,7 +64,7 @@ public class RideRepositoryImpl implements RideRepository {
     }
 
     @Override
-    public boolean beginRide(int rideId, int driverId) {
+    public boolean beginRide(Long rideId, Long driverId) {
 
         String sql = """
                     UPDATE ride
@@ -78,7 +78,7 @@ public class RideRepositoryImpl implements RideRepository {
     }
 
     @Override
-    public boolean endRide(int rideId, int driverId) {
+    public boolean endRide(Long rideId, Long driverId) {
 
         String sql = """
                     UPDATE ride
@@ -92,7 +92,7 @@ public class RideRepositoryImpl implements RideRepository {
     }
 
     @Override
-    public boolean riderCancelRide(int rideId, int riderId) {
+    public boolean riderCancelRide(Long rideId, Long riderId) {
 
         String sql = """
                     UPDATE ride
@@ -106,7 +106,7 @@ public class RideRepositoryImpl implements RideRepository {
     }
 
     @Override
-    public boolean driverCancelRide(int rideId, int driverId) {
+    public boolean driverCancelRide(Long rideId, Long driverId) {
 
         String sql = """
                     UPDATE ride
@@ -120,23 +120,23 @@ public class RideRepositoryImpl implements RideRepository {
     }
 
     @Override
-    public Ride findById(int rideId) {
+    public Ride findById(Long rideId) {
 
         String sql = "SELECT * FROM ride WHERE ride_id = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setInt(1, rideId);
+            ps.setLong(1, rideId);
             ResultSet rs = ps.executeQuery();
 
             if (!rs.next())
                 return null;
 
             Ride ride = new Ride();
-            ride.setRideId(rs.getInt("ride_id"));
-            ride.setRiderId(rs.getInt("rider_id"));
-            ride.setDriverId(rs.getInt("driver_id"));
+            ride.setRideId(rs.getLong("ride_id"));
+            ride.setRiderId(rs.getLong("rider_id"));
+            ride.setDriverId(rs.getLong("driver_id"));
             ride.setPickup(rs.getString("pickup"));
             ride.setDropoff(rs.getString("dropoff"));
             ride.setStatus(RideStatus.valueOf(rs.getString("status")));
@@ -165,7 +165,7 @@ public class RideRepositoryImpl implements RideRepository {
     }
 
     @Override
-    public List<Ride> findAvailableRidesForDriver(int driverId) {
+    public List<Ride> findAvailableRidesForDriver(Long driverId) {
 
         List<Ride> rides = new ArrayList<>();
 
@@ -195,9 +195,9 @@ public class RideRepositoryImpl implements RideRepository {
             while (rs.next()) {
 
                 Ride ride = new Ride(
-                        rs.getInt("ride_id"),
-                        rs.getInt("rider_id"),
-                        (Integer) rs.getObject("driver_id"),
+                        rs.getLong("ride_id"),
+                        rs.getLong("rider_id"),
+                        (Long) rs.getObject("driver_id"),
                         rs.getString("pickup"),
                         rs.getString("dropoff"),
                         new Location(
@@ -207,13 +207,13 @@ public class RideRepositoryImpl implements RideRepository {
                                 rs.getDouble("dropoff_lat"),
                                 rs.getDouble("dropoff_lon")),
                         RideStatus.valueOf(rs.getString("status")),
-                        rs.getTimestamp("ride_requested_at").toLocalDateTime(),
+                        rs.getTimestamp("ride_requested_at").toInstant(),
                         rs.getTimestamp("ride_accepted_at") != null
-                                ? rs.getTimestamp("ride_accepted_at").toLocalDateTime()
+                                ? rs.getTimestamp("ride_accepted_at").toInstant()
                                 : null,
 
                         rs.getTimestamp("ride_ended_at") != null
-                                ? rs.getTimestamp("ride_ended_at").toLocalDateTime()
+                                ? rs.getTimestamp("ride_ended_at").toInstant()
                                 : null);
 
                 System.out.println(
@@ -232,7 +232,7 @@ public class RideRepositoryImpl implements RideRepository {
     }
 
     @Override
-    public Ride getRideById(int rideId) {
+    public Ride getRideById(Long rideId) {
 
         String sql = """
                 SELECT
@@ -256,7 +256,7 @@ public class RideRepositoryImpl implements RideRepository {
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setInt(1, rideId);
+            ps.setLong(1, rideId);
 
             try (ResultSet rs = ps.executeQuery()) {
 
@@ -266,10 +266,10 @@ public class RideRepositoryImpl implements RideRepository {
 
                 Ride ride = new Ride();
 
-                ride.setRideId(rs.getInt("ride_id"));
-                ride.setRiderId(rs.getInt("rider_id"));
+                ride.setRideId(rs.getLong("ride_id"));
+                ride.setRiderId(rs.getLong("rider_id"));
 
-                int driverId = rs.getInt("driver_id");
+                Long driverId = rs.getLong("driver_id");
                 if (!rs.wasNull()) {
                     ride.setDriverId(driverId);
                 }
@@ -290,16 +290,16 @@ public class RideRepositoryImpl implements RideRepository {
                 ride.setStatus(RideStatus.valueOf(rs.getString("status")));
 
                 ride.setRequestedAt(
-                        rs.getTimestamp("ride_requested_at").toLocalDateTime());
+                        rs.getTimestamp("ride_requested_at").toInstant());
 
                 Timestamp acceptedTs = rs.getTimestamp("ride_accepted_at");
                 if (acceptedTs != null) {
-                    ride.setAcceptedAt(acceptedTs.toLocalDateTime());
+                    ride.setAcceptedAt(acceptedTs.toInstant());
                 }
 
                 Timestamp endedTs = rs.getTimestamp("ride_ended_at");
                 if (endedTs != null) {
-                    ride.setEndedAt(endedTs.toLocalDateTime());
+                    ride.setEndedAt(endedTs.toInstant());
                 }
 
                 return ride;
@@ -311,7 +311,7 @@ public class RideRepositoryImpl implements RideRepository {
     }
 
     @Override
-    public Ride getRideDetails(int rideId) {
+    public Ride getRideDetails(Long rideId) {
         return getRideById(rideId);
     }
 

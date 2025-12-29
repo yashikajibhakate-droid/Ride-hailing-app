@@ -17,7 +17,7 @@ public class RiderController {
 
         app.post("/rider/register", ctx -> {
             RiderCreateRequest req = ctx.bodyAsClass(RiderCreateRequest.class);
-            int riderId = riderService.registerRider(req);
+            Long riderId = riderService.registerRider(req);
             ctx.json(Map.of("riderId", riderId));
         });
 
@@ -31,13 +31,13 @@ public class RiderController {
         });
 
         app.get("/rider/ride/{rideId}", ctx -> {
-            int rideId = Integer.parseInt(ctx.pathParam("rideId"));
+            Long rideId = Long.parseLong(ctx.pathParam("rideId"));
             ctx.json(riderService.getRideDetails(rideId));
         });
 
-        app.post("/rider/ride/{rideId}/cancel", ctx -> {
-            int rideId = Integer.parseInt(ctx.pathParam("rideId"));
-            int riderId = ctx.queryParamAsClass("riderId", Integer.class).get();
+        app.patch("/rides/{rideId}", ctx -> {
+            Long rideId = Long.parseLong(ctx.pathParam("rideId"));
+            Long riderId = ctx.queryParamAsClass("riderId", Long.class).get();
             riderService.cancelRide(rideId, riderId);
             ctx.result("Ride cancelled");
         });

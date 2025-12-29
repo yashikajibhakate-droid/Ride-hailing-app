@@ -8,14 +8,16 @@ import java.util.List;
 
 public interface DriverRepository {
 
-    Driver findById(int driverId);
+    Driver findById(Long driverId);
 
-    void updateStatus(int driverId, DriverStatus status);
+    void updateStatus(Long driverId, DriverStatus status);
 
-    void updateLocation(int driverId, Location location);
+    void updateLocation(Long driverId, Location location);
 
-    Location getCurrentLocation(int driverId);
+    DriverStatus getDriverStatus(Long driverId);
+
+    Location getCurrentLocation(Long driverId);
 
     List<Driver> findAvailableDriversNear(Location pickupLocation, double radiusMeters);
-    int save(String name, String phone, String email);
+    Long save(String name, String phone, String email, DriverStatus status);
 }

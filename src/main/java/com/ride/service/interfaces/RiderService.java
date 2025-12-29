@@ -12,11 +12,11 @@ public interface RiderService {
             CreateRideRequestDTO request
     );
 
-    Ride getRideDetails(int rideId);
+    Ride getRideDetails(Long rideId);
 
-    void cancelRide(int rideId, int riderId);
+    void cancelRide(Long rideId, Long riderId);
 
-    void validateRider(int riderId);
+    void validateRider(Long riderId);
 
-    int registerRider(RiderCreateRequest req);
+    Long registerRider(RiderCreateRequest req);
 }

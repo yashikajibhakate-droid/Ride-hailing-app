@@ -1,7 +1,7 @@
 package com.ride.domain.driver;
 
 public class Driver {
-    private int driverId;
+    private Long driverId;
     private String driverName;
     private String phone;
     private String licenseNo;
@@ -10,7 +10,7 @@ public class Driver {
 
     private String currentlyDrivingVehicleNo;
 
-    public Driver(int driverId, String driverName, String phone,
+    public Driver(Long driverId, String driverName, String phone,
             String licenseNo, String currentlyDrivingVehicleNo, String email) {
         this.driverId = driverId;
         this.driverName = driverName;
@@ -32,7 +32,7 @@ public class Driver {
         return status;
     }
 
-    public int getDriverId() {
+    public Long getDriverId() {
         return driverId;
     }
 

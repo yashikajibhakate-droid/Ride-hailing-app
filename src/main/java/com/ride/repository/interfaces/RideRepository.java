@@ -8,22 +8,22 @@ public interface RideRepository {
 
     Ride save(Ride ride);
 
-    boolean acceptRide(int rideId, int driverId);
+    boolean acceptRide(Long rideId, Long driverId);
 
-    boolean beginRide(int rideId, int driverId);
+    boolean beginRide(Long rideId, Long driverId);
 
-    boolean endRide(int rideId, int driverId);
+    boolean endRide(Long rideId, Long driverId);
 
-    boolean riderCancelRide(int rideId, int riderId);
+    boolean riderCancelRide(Long rideId, Long riderId);
 
-    boolean driverCancelRide(int rideId, int driverId);
+    boolean driverCancelRide(Long rideId, Long driverId);
 
-    Ride findById(int rideId);
+    Ride findById(Long rideId);
 
-    Ride getRideDetails(int rideId);
+    Ride getRideDetails(Long rideId);
 
-    Ride getRideById(int rideId);
+    Ride getRideById(Long rideId);
 
-    List<Ride> findAvailableRidesForDriver(int driverId);
+    List<Ride> findAvailableRidesForDriver(Long driverId);
 
 }

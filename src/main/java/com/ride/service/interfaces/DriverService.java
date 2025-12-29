@@ -9,18 +9,18 @@ import java.util.List;
 
 public interface DriverService {
 
-    void updateDriverLocation(int driverId, Location location);
+    void updateDriverLocation(Long driverId, Location location);
 
-    List<Ride> getAvailableRides(int driverId);
+    List<Ride> getAvailableRides(Long driverId);
 
-    boolean acceptRide(int rideId, int driverId);
+    boolean acceptRide(Long rideId, Long driverId);
 
-    void driverCancelRide(int rideId, int driverId);
+    void driverCancelRide(Long rideId, Long driverId);
 
-    void beginRide(int rideId, int driverId, Location location);
+    void beginRide(Long rideId, Long driverId, Location location);
 
-    void endRide(int rideId, int driverId, Location location);
+    void endRide(Long rideId, Long driverId, Location location);
 
-    void updateStatus(int driverId, DriverStatus status);
-    int registerDriver(DriverCreateRequest req);
+    void updateStatus(Long driverId, DriverStatus status);
+    Long registerDriver(DriverCreateRequest req);
 }

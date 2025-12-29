@@ -12,7 +12,7 @@ public class RiderRepositoryImpl implements RiderRepository {
 
 
     @Override
-    public int saveRider(String name, String phone_number, String email) {
+    public Long saveRider(String name, String phone_number, String email) {
         String sql =
             "INSERT INTO rider (name, phone_number, email) " +
             "VALUES (?, ?, ?) " +
@@ -24,25 +24,25 @@ public class RiderRepositoryImpl implements RiderRepository {
             ps.setString(3, email);
             ResultSet rs = ps.executeQuery();
             rs.next();
-            return rs.getInt("rider_id");
+            return rs.getLong("rider_id");
         } catch (Exception e) {
             throw new RuntimeException("Error saving rider", e);
         }
     }
 
     @Override
-    public Rider findById(int riderId) {
+    public Rider findById(Long riderId) {
         String sql = "SELECT rider_id, name, phone, email FROM rider WHERE rider_id = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setInt(1, riderId);
+            ps.setLong(1, riderId);
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
                 return new Rider(
-                        rs.getInt("rider_id"),
+                        rs.getLong("rider_id"),
                         rs.getString("name"),
                         rs.getString("phone"),
                         rs.getString("email")
@@ -56,13 +56,13 @@ public class RiderRepositoryImpl implements RiderRepository {
     }
 
     @Override
-    public boolean existsById(int riderId) {
+    public boolean existsById(Long riderId) {
         String sql = "SELECT 1 FROM rider WHERE rider_id = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setInt(1, riderId);
+            ps.setLong(1, riderId);
             ResultSet rs = ps.executeQuery();
             return rs.next();
 
